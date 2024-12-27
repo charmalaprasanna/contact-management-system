@@ -1,0 +1,157 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_CONTACTS 100
+#define MAX_NAME_LENGTH 50
+#define MAX_PHONE_LENGTH 15
+#define MAX_EMAIL_LENGTH 100
+
+// Structure to store contact details
+typedef struct {
+    char name[MAX_NAME_LENGTH];
+    char phone[MAX_PHONE_LENGTH];
+    char email[MAX_EMAIL_LENGTH];
+} Contact;
+
+// Function prototypes
+void addContact(Contact contacts[], int *contactCount);
+void viewContacts(Contact contacts[], int contactCount);
+void searchContact(Contact contacts[], int contactCount);
+void deleteContact(Contact contacts[], int *contactCount);
+void clearBuffer();
+
+int main() {
+    Contact contacts[MAX_CONTACTS];
+    int contactCount = 0;
+    int choice;
+
+    while (1) {
+        printf("\nContact Management System\n");
+        printf("1. Add Contact\n");
+        printf("2. View Contacts\n");
+        printf("3. Search Contact\n");
+        printf("4. Delete Contact\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        clearBuffer();  // Clear the buffer to avoid issues with input
+        
+        switch (choice) {
+            case 1:
+                addContact(contacts, &contactCount);
+                break;
+            case 2:
+                viewContacts(contacts, contactCount);
+                break;
+            case 3:
+                searchContact(contacts, contactCount);
+                break;
+            case 4:
+                deleteContact(contacts, &contactCount);
+                break;
+            case 5:
+                printf("Exiting...\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+    
+    return 0;
+}
+
+// Function to add a new contact
+void addContact(Contact contacts[], int *contactCount) {
+    if (*contactCount < MAX_CONTACTS) {
+        printf("Enter Name: ");
+        fgets(contacts[*contactCount].name, MAX_NAME_LENGTH, stdin);
+        contacts[*contactCount].name[strcspn(contacts[*contactCount].name, "\n")] = '\0';  // Remove newline
+        
+        printf("Enter Phone Number: ");
+        fgets(contacts[*contactCount].phone, MAX_PHONE_LENGTH, stdin);
+        contacts[*contactCount].phone[strcspn(contacts[*contactCount].phone, "\n")] = '\0';  // Remove newline
+        
+        printf("Enter Email Address: ");
+        fgets(contacts[*contactCount].email, MAX_EMAIL_LENGTH, stdin);
+        contacts[*contactCount].email[strcspn(contacts[*contactCount].email, "\n")] = '\0';  // Remove newline
+        
+        (*contactCount)++;
+        printf("Contact added successfully.\n");
+    } else {
+        printf("Contact list is full. Cannot add more contacts.\n");
+    }
+}
+
+// Function to view all contacts
+void viewContacts(Contact contacts[], int contactCount) {
+    if (contactCount == 0) {
+        printf("No contacts to display.\n");
+    } else {
+        printf("\nList of Contacts:\n");
+        for (int i = 0; i < contactCount; i++) {
+            printf("\nContact %d:\n", i + 1);
+            printf("Name: %s\n", contacts[i].name);
+            printf("Phone: %s\n", contacts[i].phone);
+            printf("Email: %s\n", contacts[i].email);
+        }
+    }
+}
+
+// Function to search a contact by name
+void searchContact(Contact contacts[], int contactCount) {
+    char searchName[MAX_NAME_LENGTH];
+    int found = 0;
+    
+    printf("Enter name to search: ");
+    fgets(searchName, MAX_NAME_LENGTH, stdin);
+    searchName[strcspn(searchName, "\n")] = '\0';  // Remove newline
+    
+    for (int i = 0; i < contactCount; i++) {
+        if (strcmp(contacts[i].name, searchName) == 0) {
+            printf("\nContact found:\n");
+            printf("Name: %s\n", contacts[i].name);
+            printf("Phone: %s\n", contacts[i].phone);
+            printf("Email: %s\n", contacts[i].email);
+            found = 1;
+            break;
+        }
+    }
+    
+    if (!found) {
+        printf("No contact found with the name '%s'.\n", searchName);
+    }
+}
+
+// Function to delete a contact by name
+void deleteContact(Contact contacts[], int *contactCount) {
+    char deleteName[MAX_NAME_LENGTH];
+    int found = 0;
+    
+    printf("Enter name to delete: ");
+    fgets(deleteName, MAX_NAME_LENGTH, stdin);
+    deleteName[strcspn(deleteName, "\n")] = '\0';  // Remove newline
+    
+    for (int i = 0; i < *contactCount; i++) {
+        if (strcmp(contacts[i].name, deleteName) == 0) {
+            // Shift the contacts down to fill the deleted one
+            for (int j = i; j < *contactCount - 1; j++) {
+                contacts[j] = contacts[j + 1];
+            }
+            (*contactCount)--;
+            printf("Contact '%s' deleted successfully.\n", deleteName);
+            found = 1;
+            break;
+        }
+    }
+    
+    if (!found) {
+        printf("No contact found with the name '%s'.\n", deleteName);
+    }
+}
+
+// Function to clear the input buffer after using scanf
+void clearBuffer() {
+    while (getchar() != '\n');
+}
